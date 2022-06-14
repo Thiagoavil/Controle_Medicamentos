@@ -17,18 +17,18 @@ namespace ControleMedicamentos.Dominio.ModuloRequisicao
 
         public override bool Equals(object obj)
         {
-            Requisicao medicamento = obj as Requisicao;
+            Requisicao requisicao = obj as Requisicao;
 
-            if (medicamento == null)
+            if (requisicao == null)
                 return false;
 
             return
-                medicamento.Id.Equals(Id) &&
-                medicamento.Medicamento.Equals(Medicamento) &&
-                medicamento.Paciente.Equals(Paciente) &&
-                medicamento.QtdMedicamento.Equals(QtdMedicamento) &&
-                medicamento.Data.Equals(Data) &&
-                medicamento.Funcionario.Equals(Funcionario);
+                requisicao.Id.Equals(Id) &&
+                requisicao.Medicamento.Equals(Medicamento) &&
+                requisicao.Paciente.Equals(Paciente) &&
+                requisicao.QtdMedicamento.Equals(QtdMedicamento) &&
+                requisicao.Data.Equals(Data) &&
+                requisicao.Funcionario.Equals(Funcionario);
         }
     }
 }

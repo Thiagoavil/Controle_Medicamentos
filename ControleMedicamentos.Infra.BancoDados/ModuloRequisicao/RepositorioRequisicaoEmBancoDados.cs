@@ -13,5 +13,7 @@ namespace ControleMedicamentos.Infra.BancoDados.ModuloRequisicao
             "Initial Catalog ControleMedicamentos.Projeto.SqlServer;" +
             "Integrated Security = True;" +
             "Pooling=False";
+
+
     }
 }
