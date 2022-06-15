@@ -42,9 +42,8 @@ namespace ControleMedicamentos.Dominio.ModuloMedicamento
                 medicamento.Lote.Equals(Lote) &&
                 medicamento.Validade.Equals(Validade) &&
                 medicamento.QuantidadeDisponivel.Equals(QuantidadeDisponivel) &&
-                medicamento.Requisicoes.Equals(Requisicoes) &&
-                medicamento.Fornecedor.Equals(Fornecedor) &&
-                medicamento.QuantidadeRequisicoes.Equals(QuantidadeRequisicoes);
+                medicamento.Fornecedor.Equals(Fornecedor);
+                
         }
     }
 }
