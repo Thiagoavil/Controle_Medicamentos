@@ -11,7 +11,17 @@ namespace ControleMedicamentos.Dominio.ModuloFuncionario
     {
         public ValidadorFuncionario()
         {
+            RuleFor(x => x.Nome)
+                .NotNull().WithMessage("Campo 'Nome' não pode ser nulo")
+                .NotEmpty().WithMessage("Campo 'Nome' não pode ser vazio");
 
+            RuleFor(x => x.Login)
+                .NotNull().WithMessage("Campo 'Login' não pode ser nulo")
+                .NotEmpty().WithMessage("Campo 'Login' não pode ser vazio");
+
+            RuleFor(x => x.Senha)
+                .NotNull().WithMessage("Campo 'Senha' não pode ser nulo")
+                .NotEmpty().WithMessage("Campo 'Senha' não pode ser vazio");
         }
     }
 }

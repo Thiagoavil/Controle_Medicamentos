@@ -15,6 +15,29 @@ namespace ControleMedicamentos.Dominio.ModuloRequisicao
         public DateTime Data { get; set; }
         public Funcionario Funcionario { get; set; }
 
+        public void InserirPaciente(Paciente paciente)
+        {
+            if (paciente == null)
+                return;
+
+            Paciente = paciente;
+        }
+
+        public void InserirFuncionario(Funcionario funcionario)
+        {
+            if (funcionario == null)
+                return;
+
+            Funcionario = funcionario;
+        }
+
+        public void InserirMedicamento(Medicamento medicamento)
+        {
+            if (medicamento == null)
+                return;
+
+            Medicamento = medicamento;
+        }
         public override bool Equals(object obj)
         {
             Requisicao requisicao = obj as Requisicao;

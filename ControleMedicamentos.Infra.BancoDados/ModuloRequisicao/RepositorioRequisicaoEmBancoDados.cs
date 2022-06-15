@@ -1,5 +1,11 @@
-﻿using System;
+﻿using ControleMedicamentos.Dominio.ModuloFuncionario;
+using ControleMedicamentos.Dominio.ModuloMedicamento;
+using ControleMedicamentos.Dominio.ModuloPaciente;
+using ControleMedicamentos.Dominio.ModuloRequisicao;
+using FluentValidation.Results;
+using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -118,8 +124,179 @@ namespace ControleMedicamentos.Infra.BancoDados.ModuloRequisicao
                     REQUISICAO.[MEDICAMENTO_NUMERO] = MEDICAMENTO.[ID]
                 WHERE
                     REQUISICAO.[ID] = @ID";
-        
+
         #endregion
 
+        public ValidationResult Inserir(Requisicao novaRequisicao)
+        {
+            var validador = new ValidadorRequisicao();
+
+            var resultadoValidacao = validador.Validate(novaRequisicao);
+
+            if (resultadoValidacao.IsValid == false)
+                return resultadoValidacao;
+
+            SqlConnection conexaoComBanco = new SqlConnection(enderecoBanco);
+
+            SqlCommand comandoInsercao = new SqlCommand(sqlInserir, conexaoComBanco);
+
+            ConfigurarParametrosRequisicao(novaRequisicao, comandoInsercao);
+
+            conexaoComBanco.Open();
+            var id = comandoInsercao.ExecuteScalar();
+            novaRequisicao.Id = Convert.ToInt32(id);
+
+            conexaoComBanco.Close();
+
+            return resultadoValidacao;
+        }
+
+        public ValidationResult Editar(Requisicao requisicao)
+        {
+            var validador = new ValidadorRequisicao();
+
+            var resultadoValidacao = validador.Validate(requisicao);
+
+            if (resultadoValidacao.IsValid == false)
+                return resultadoValidacao;
+
+            SqlConnection conexaoComBanco = new SqlConnection(enderecoBanco);
+
+            SqlCommand comandoEdicao = new SqlCommand(sqlEditar, conexaoComBanco);
+
+            ConfigurarParametrosRequisicao(requisicao, comandoEdicao);
+
+            conexaoComBanco.Open();
+            comandoEdicao.ExecuteNonQuery();
+            conexaoComBanco.Close();
+
+            return resultadoValidacao;
+        }
+
+        public ValidationResult Excluir(Requisicao requisicao)
+        {
+
+            SqlConnection conexaoComBanco = new SqlConnection(enderecoBanco);
+
+            SqlCommand comandoExclusao = new SqlCommand(sqlExcluir, conexaoComBanco);
+
+            comandoExclusao.Parameters.AddWithValue("ID", requisicao.Id);
+
+            conexaoComBanco.Open();
+            int numeroRegistrosExcluidos = comandoExclusao.ExecuteNonQuery();
+
+            var resultadoValidacao = new ValidationResult();
+
+            if (numeroRegistrosExcluidos == 0)
+                resultadoValidacao.Errors.Add(new ValidationFailure("", "Não foi possível remover o registro"));
+
+            conexaoComBanco.Close();
+
+            return resultadoValidacao;
+        }
+
+        public List<Requisicao> SelecionarTodos()
+        {
+            SqlConnection conexaoComBanco = new SqlConnection(enderecoBanco);
+
+            SqlCommand comandoSelecao = new SqlCommand(sqlSelecionarTodos, conexaoComBanco);
+
+            conexaoComBanco.Open();
+            SqlDataReader leitorRequisicao = comandoSelecao.ExecuteReader();
+
+            List<Requisicao> requisicoes = new List<Requisicao>();
+
+            while (leitorRequisicao.Read())
+            {
+                Requisicao requisicao = ConverterParaRequisicao(leitorRequisicao);
+
+                requisicoes.Add(requisicao);
+            }
+
+            conexaoComBanco.Close();
+
+            return requisicoes;
+        }
+
+        public Requisicao SelecionarPorNumero(int numero)
+        {
+            SqlConnection conexaoComBanco = new SqlConnection(enderecoBanco);
+
+            SqlCommand comandoSelecao = new SqlCommand(sqlSelecionarPorNumero, conexaoComBanco);
+
+            comandoSelecao.Parameters.AddWithValue("ID", numero);
+
+            conexaoComBanco.Open();
+            SqlDataReader leitorRequisicao = comandoSelecao.ExecuteReader();
+
+            Requisicao requisicao = null;
+            if (leitorRequisicao.Read())
+                requisicao = ConverterParaRequisicao(leitorRequisicao);
+
+            conexaoComBanco.Close();
+
+            return requisicao;
+        }
+
+        private static Requisicao ConverterParaRequisicao(SqlDataReader leitorRequisicao)
+        {
+            int idRequisicao = Convert.ToInt32(leitorRequisicao["ID"]);
+            int quantidadeMedicamentos = Convert.ToInt32(leitorRequisicao["QUANTIDADEMEDICAMENTO"]);
+            DateTime dataRequisicao = Convert.ToDateTime(leitorRequisicao["DATA"]);
+            
+            int idPaciente = Convert.ToInt32(leitorRequisicao["PACIENTE_ID"]);
+            string nomePaciente = Convert.ToString(leitorRequisicao["PACIENTE_NOME"]);
+            string cartaoSus = Convert.ToString(leitorRequisicao["PACIENTE_CARTAOSUS"]);
+
+            int idFuncionario = Convert.ToInt32(leitorRequisicao["FUNCIONARIO_ID"]);
+            string nomeFuncionario = Convert.ToString(leitorRequisicao["FUNCIONARIO_NOME"]);
+            string loginFuncionario = Convert.ToString(leitorRequisicao["FUNCIONARIO_LOGIN"]);
+            string senhaFuncionario = Convert.ToString(leitorRequisicao["FUNCIONARIO_SENHA"]);
+
+            int idMedicamento = Convert.ToInt32(leitorRequisicao["MEDICAMENTO_ID"]);
+            string nomeMedicamento = Convert.ToString(leitorRequisicao["MEDICAMENTO_NOME"]);
+            string descricaoMedicamento = Convert.ToString(leitorRequisicao["MEDICAMENTO_DESCRICAO"]);
+            string loteMedicamento = Convert.ToString(leitorRequisicao["MEDICAMENTO_LOTE"]);
+            DateTime validadeMedicamento = Convert.ToDateTime(leitorRequisicao["MEDICAMENTO_VALIDADE"]);
+            int quantidadeMedicamentoDisponivel = Convert.ToInt32(leitorRequisicao["MEDICAMENTO_QUANTIDADE"]);
+
+            var requisicao = new Requisicao()
+            {
+                Id = idRequisicao,
+                QtdMedicamento = quantidadeMedicamentos,
+                Data = dataRequisicao,
+            };
+
+            var paciente = new Paciente(nomePaciente,cartaoSus)
+            { 
+                Id= idPaciente,
+            };
+
+            var funcionario = new Funcionario(nomeFuncionario,loginFuncionario,senhaFuncionario)
+            { 
+                Id = idFuncionario
+            };
+
+            var medicamento = new Medicamento(nomeMedicamento, descricaoMedicamento, loteMedicamento, validadeMedicamento)
+            {
+                Id = idMedicamento
+            };
+
+            requisicao.InserirMedicamento(medicamento);
+            requisicao.InserirFuncionario(funcionario);
+            requisicao.InserirPaciente(paciente);
+
+            return requisicao;
+        }
+
+        private static void ConfigurarParametrosRequisicao(Requisicao novaRequisicao, SqlCommand comando)
+        {
+            comando.Parameters.AddWithValue("ID", novaRequisicao.Id);
+            comando.Parameters.AddWithValue("FUNCIONARIO_ID", novaRequisicao.Funcionario.Id);
+            comando.Parameters.AddWithValue("PACIENTE_ID", novaRequisicao.Paciente.Id);
+            comando.Parameters.AddWithValue("MEDICAMENTO_ID", novaRequisicao.Medicamento.Id);
+            comando.Parameters.AddWithValue("QUANTIDADEMEDICAMENTO", novaRequisicao.QtdMedicamento);
+            comando.Parameters.AddWithValue("DATA", novaRequisicao.Data);
+        }
     }
 }
