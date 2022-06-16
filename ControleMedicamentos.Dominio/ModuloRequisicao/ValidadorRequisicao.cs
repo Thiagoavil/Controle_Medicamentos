@@ -24,7 +24,7 @@ namespace ControleMedicamentos.Dominio.ModuloRequisicao
                 .NotEmpty().WithMessage("Campo 'Quantidade de Medicamento' não pode ser vazia ");
 
             RuleFor(x => x.Data)
-                .GreaterThan(System.DateTime.MinValue).WithMessage("'Data' incorreto");
+                .GreaterThan(System.DateTime.MinValue).WithMessage("Campo 'Data' incorreto");
         }
     }
 }

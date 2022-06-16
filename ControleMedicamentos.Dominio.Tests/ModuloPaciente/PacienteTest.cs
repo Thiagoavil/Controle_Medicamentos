@@ -48,7 +48,7 @@ namespace ControleMedicamentos.Dominio.Tests.ModuloPaciente
         public void Cartao_nao_Pode_Ser_Nulo()
         {
             //arrange
-            Paciente paciente = new("José", null);
+            Paciente paciente = new("Thiago", null);
 
             ValidadorPaciente validacao = new();
 
@@ -64,7 +64,7 @@ namespace ControleMedicamentos.Dominio.Tests.ModuloPaciente
         public void Cartao_nao_Pode_Ser_Vazio()
         {
             //arrange
-            Paciente paciente = new("José", "");
+            Paciente paciente = new("Thiago", "");
 
             ValidadorPaciente validacao = new();
 

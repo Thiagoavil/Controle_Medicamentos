@@ -20,6 +20,8 @@ namespace ControleMedicamentos.Dominio.ModuloFornecedor
                 .NotEmpty().WithMessage("Campo 'Telefone' Não pode ser vazio");
 
             RuleFor(x => x.Email)
+                .NotNull().WithMessage("Campo 'Email' Não pode ser nulo")
+                .NotEmpty().WithMessage("Campo 'Email' Não pode ser vazio")
                 .EmailAddress().WithMessage("Campo 'Email' Formato incorreto");
 
             RuleFor(x => x.Cidade)

@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace ControleMedicamentos.Infra.BancoDados.ModuloRequisicao
 {
-    internal class RepositorioRequisicaoEmBancoDados
+    public class RepositorioRequisicaoEmBancoDados
     {
         private const string enderecoBanco =
             "Data Source=(localdb)\\MSSQLLocalDB;" +

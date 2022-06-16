@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace ControleMedicamento.Infra.BancoDados.ModuloMedicamento
 {
-    internal class RepositorioMedicamentoEmBancoDados
+    public class RepositorioMedicamentoEmBancoDados
     {
         private const string enderecoBanco =
             "Data Source=(localdb)\\MSSQLLocalDB;" +

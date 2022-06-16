@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace ControleMedicamentos.Infra.BancoDados.ModuloFornecedor
 {
-    internal class RepositorioFornecedorEmBancoDados
+    public class RepositorioFornecedorEmBancoDados
     {
          private const string enderecoBanco= 
             "Data Source=(localdb)\\MSSQLLocalDB;"+
-            "Initial Catalog ControleMedicamentos.Projeto.SqlServer;"+
+            "Initial Catalog = ControleMedicamentos.Projeto.SqlServer;"+
             "Integrated Security = True;"+ 
             "Pooling=False";
 
@@ -213,7 +213,7 @@ namespace ControleMedicamentos.Infra.BancoDados.ModuloFornecedor
 
         private static void ConfigurarParametrosFornecedor(Fornecedor novoFornecedor, SqlCommand comando)
         {
-            comando.Parameters.AddWithValue("NUMERO", novoFornecedor.Id);
+            comando.Parameters.AddWithValue("ID", novoFornecedor.Id);
             comando.Parameters.AddWithValue("NOME", novoFornecedor.Nome);
             comando.Parameters.AddWithValue("TELEFONE", novoFornecedor.Telefone);
             comando.Parameters.AddWithValue("EMAIL", novoFornecedor.Email);
