@@ -1,4 +1,5 @@
-﻿using ControleMedicamentos.Dominio.ModuloFuncionario;
+﻿using ControleMedicamentos.Dominio.ModuloFornecedor;
+using ControleMedicamentos.Dominio.ModuloFuncionario;
 using ControleMedicamentos.Dominio.ModuloMedicamento;
 using ControleMedicamentos.Dominio.ModuloPaciente;
 using ControleMedicamentos.Dominio.ModuloRequisicao;
@@ -14,13 +15,13 @@ namespace ControleMedicamento.Infra.BancoDados.ModuloMedicamento
     {
         private const string enderecoBanco =
             "Data Source=(localdb)\\MSSQLLocalDB;" +
-            "Initial Catalog ControleMedicamentos.Projeto.SqlServer;" +
+            "Initial Catalog = ControleMedicamentos.Projeto.SqlServer;" +
             "Integrated Security = True;" +
             "Pooling=False";
 
         #region Sql Queries
         private const string sqlInserir =
-            @"INSERT INTO [TBMEDICAMENTOS] 
+            @"INSERT INTO [TBMEDICAMENTO] 
                 (
                     [NOME],
                     [DESCRICAO],
@@ -41,7 +42,7 @@ namespace ControleMedicamento.Infra.BancoDados.ModuloMedicamento
                 );SELECT SCOPE_IDENTITY();";
 
         private const string sqlEditar =
-           @"UPDATE [TBMEDICAMENTOS]	
+           @"UPDATE [TBMEDICAMENTO]	
 		        SET
 			        [NOME] = @NOME
                     [DESCRICAO] = @DESCRICAO
@@ -54,7 +55,7 @@ namespace ControleMedicamento.Infra.BancoDados.ModuloMedicamento
 			        [ID] = @ID";
 
         private const string sqlExcluir =
-            @"DELETE FROM [TBMEDICAMENTOS]
+            @"DELETE FROM [TBMEDICAMENTO]
 		        WHERE
 			        [ID] = @ID";
 
@@ -67,18 +68,18 @@ namespace ControleMedicamento.Infra.BancoDados.ModuloMedicamento
 		            MEDICAMENTO.[VALIDADE],
 		            MEDICAMENTO.[QUANTIDADEDISPONIVEL],
                     
-                    FORNECEDOR.[ID] AS FORNECEDOR_NUMERO,
+                    FORNECEDOR.[ID] AS FORNECEDOR_ID,
                     FORNECEDOR.[NOME] AS FORNECEDOR_NOME,
                     FORNECEDOR.[TELEFONE] AS FORNECEDOR_TELEFONE,
                     FORNECEDOR.[EMAIL] AS FORNECEDOR_EMAIL,
                     FORNECEDOR.[CIDADE] AS FORNECEDOR_CIDADE,
-                    FORNECEDOR.[ESTADO] AS FORNECEDOR_ESTADO,
+                    FORNECEDOR.[ESTADO] AS FORNECEDOR_ESTADO
 		          
 	            FROM 
 		            [TBMEDICAMENTO] AS MEDICAMENTO INNER JOIN
                     [TBFORNECEDOR] AS FORNECEDOR
                 ON
-                    MEDICAMENTO.[FORNECEDOR_NUMERO] = FORNECEDOR.[ID]";
+                    MEDICAMENTO.[FORNECEDOR_ID] = FORNECEDOR.[ID]";
 
         private const string sqlSelecionarPorNumero =
           @"SELECT 
@@ -89,18 +90,18 @@ namespace ControleMedicamento.Infra.BancoDados.ModuloMedicamento
 		            MEDICAMENTO.[VALIDADE],
 		            MEDICAMENTO.[QUANTIDADEDISPONIVEL],
                     
-                    FORNECEDOR.[ID] AS FORNECEDOR_NUMERO,
+                    FORNECEDOR.[ID] AS FORNECEDOR_ID,
                     FORNECEDOR.[NOME] AS FORNECEDOR_NOME,
                     FORNECEDOR.[TELEFONE] AS FORNECEDOR_TELEFONE,
                     FORNECEDOR.[EMAIL] AS FORNECEDOR_EMAIL,
                     FORNECEDOR.[CIDADE] AS FORNECEDOR_CIDADE,
-                    FORNECEDOR.[ESTADO] AS FORNECEDOR_ESTADO,
+                    FORNECEDOR.[ESTADO] AS FORNECEDOR_ESTADO
 		          
 	            FROM 
 		            [TBMEDICAMENTO] AS MEDICAMENTO INNER JOIN
                     [TBFORNECEDOR] AS FORNECEDOR
                 ON
-                    MEDICAMENTO.[FORNECEDOR_NUMERO] = FORNECEDOR.[ID]
+                    MEDICAMENTO.[FORNECEDOR_ID] = FORNECEDOR.[ID]
                 WHERE
                     MEDICAMENTO.[ID] = @ID";
 
@@ -314,13 +315,26 @@ namespace ControleMedicamento.Infra.BancoDados.ModuloMedicamento
             string lote = Convert.ToString(leitorMedicamento["LOTE"]);
             DateTime validade = Convert.ToDateTime(leitorMedicamento["VALIDADE"]);
             int quantidadeDisponivel = Convert.ToInt32(leitorMedicamento["QUANTIDADEDISPONIVEL"]);
+            
             int fornecedorId = Convert.ToInt32(leitorMedicamento["FORNECEDOR_ID"]);
+            string fornecedorNome = Convert.ToString(leitorMedicamento["FORNECEDOR_NOME"]);
+            string fornecedorTelefone = Convert.ToString(leitorMedicamento["FORNECEDOR_TELEFONE"]);
+            string fornecedorEmail = Convert.ToString(leitorMedicamento["FORNECEDOR_EMAIL"]);
+            string fornecedorCidade = Convert.ToString(leitorMedicamento["FORNECEDOR_CIDADE"]);
+            string fornecedorEstado = Convert.ToString(leitorMedicamento["FORNECEDOR_ESTADO"]);
 
             var medicamento = new Medicamento
                 (nome, descricao, lote, validade)
             {
                 Id = numero,
-                QuantidadeDisponivel = quantidadeDisponivel
+                QuantidadeDisponivel = quantidadeDisponivel,
+                
+                Fornecedor = new Fornecedor
+                (fornecedorNome, fornecedorTelefone, fornecedorEmail,
+                fornecedorCidade, fornecedorEstado)
+                {
+                    Id = fornecedorId
+                }
             };
 
             return medicamento;

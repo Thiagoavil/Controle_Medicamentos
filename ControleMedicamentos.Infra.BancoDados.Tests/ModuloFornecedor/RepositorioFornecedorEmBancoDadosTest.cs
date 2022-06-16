@@ -21,7 +21,7 @@ namespace ControleMedicamentos.Infra.BancoDados.Tests.ModuloFornecedor
         {
             db.ComandoSql("DELETE FROM TBFORNECEDOR; DBCC CHECKIDENT (TBFORNECEDOR, RESEED, 0)");
 
-            fornecedor = new("Fornecedor1", "987654321", " Fornecedor@gmail.com", "Lages", "SC");
+            fornecedor = new("umbrella", "322241578", " thiago@gmail.com", "Joiville", "SC");
 
             repositorioFornecedor = new();
         }
@@ -44,11 +44,11 @@ namespace ControleMedicamentos.Infra.BancoDados.Tests.ModuloFornecedor
         {
             repositorioFornecedor.Inserir(fornecedor);
 
-            fornecedor.Nome = "Tio Home";
-            fornecedor.Telefone = "456132789";
-            fornecedor.Email = "TioHome@gmail.com";
-            fornecedor.Cidade = "Curitiba";
-            fornecedor.Estado = "PR";
+            fornecedor.Nome = "ttfornecedor";
+            fornecedor.Telefone = "23514689";
+            fornecedor.Email = "oloquinho@gmail.com";
+            fornecedor.Cidade = "Lagoa Vermelha";
+            fornecedor.Estado = "RS";
 
             repositorioFornecedor.Editar(fornecedor);
 

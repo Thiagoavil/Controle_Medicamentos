@@ -13,7 +13,7 @@ namespace ControleMedicamentos.Infra.BancoDados.ModuloFuncionario
     {
         private const string enderecoBanco =
             "Data Source=(localdb)\\MSSQLLocalDB;" +
-            "Initial Catalog ControleMedicamentos.Projeto.SqlServer;" +
+            "Initial Catalog = ControleMedicamentos.Projeto.SqlServer;" +
             "Integrated Security = True;" +
             "Pooling=False";
 
@@ -180,7 +180,7 @@ namespace ControleMedicamentos.Infra.BancoDados.ModuloFuncionario
 
         private static Funcionario ConverterParaFuncionario(SqlDataReader leitorFuncionario)
         {
-            int numero = Convert.ToInt32(leitorFuncionario["NUMERO"]);
+            int numero = Convert.ToInt32(leitorFuncionario["ID"]);
             string nome = Convert.ToString(leitorFuncionario["NOME"]);
             string login = Convert.ToString(leitorFuncionario["LOGIN"]);
             string senha = Convert.ToString(leitorFuncionario["SENHA"]);

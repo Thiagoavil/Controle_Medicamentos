@@ -13,7 +13,7 @@ namespace ControleMedicamentos.Infra.BancoDados.ModuloPaciente
     {
         private const string enderecoBanco =
             "Data Source=(localdb)\\MSSQLLocalDB;" +
-            "Initial Catalog ControleMedicamentos.Projeto.SqlServer;" +
+            "Initial Catalog = ControleMedicamentos.Projeto.SqlServer;" +
             "Integrated Security = True;" +
             "Pooling=False";
 
