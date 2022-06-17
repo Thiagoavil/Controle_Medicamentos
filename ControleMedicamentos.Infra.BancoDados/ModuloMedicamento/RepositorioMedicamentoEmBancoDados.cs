@@ -44,11 +44,11 @@ namespace ControleMedicamento.Infra.BancoDados.ModuloMedicamento
         private const string sqlEditar =
            @"UPDATE [TBMEDICAMENTO]	
 		        SET
-			        [NOME] = @NOME
-                    [DESCRICAO] = @DESCRICAO
-                    [LOTE] = @LOTE
-                    [VALIDADE] = @VALIDADE
-                    [QUANTIDADEDISPONIVEL] = @QUANTIDADEDISPONIVEL
+			        [NOME] = @NOME,
+                    [DESCRICAO] = @DESCRICAO,
+                    [LOTE] = @LOTE,
+                    [VALIDADE] = @VALIDADE,
+                    [QUANTIDADEDISPONIVEL] = @QUANTIDADEDISPONIVEL,
                     [FORNECEDOR_ID] = @FORNECEDOR_ID
 			       
 		        WHERE
@@ -125,7 +125,7 @@ namespace ControleMedicamento.Infra.BancoDados.ModuloMedicamento
                 TBPaciente AS PACIENTE 
             ON 
                 REQUISICAO.[PACIENTE_ID] = PACIENTE.[ID]
-                INNER JOIN TBFUNCIONARIO 
+                INNER JOIN TBFUNCIONARIO AS FUNCIONARIO
             ON
                 REQUISICAO.[FUNCIONARIO_ID] = FUNCIONARIO.[ID]";
 
@@ -149,7 +149,7 @@ namespace ControleMedicamento.Infra.BancoDados.ModuloMedicamento
                 TBPaciente AS PACIENTE 
             ON 
                 REQUISICAO.[PACIENTE_ID] = PACIENTE.[ID]
-                INNER JOIN TBFUNCIONARIO 
+                INNER JOIN TBFUNCIONARIO AS FUNCIONARIO
             ON
                 REQUISICAO.[FUNCIONARIO_ID] = FUNCIONARIO.[ID]
             WHERE
@@ -241,27 +241,39 @@ namespace ControleMedicamento.Infra.BancoDados.ModuloMedicamento
             if (sqlDataReader.Read())
             {
                 medicamento = ConverterParaMedicamento(sqlDataReader);
+            }
+            sqlDataReader.Close();
 
-                SqlCommand sqlComandoRequisicao = new SqlCommand
+            if(medicamento!=null)
+            {
+                List<Requisicao> requisicoes = CarregarRequisicoes(conexaoComBanco, medicamento);
+                conexaoComBanco.Close();
+            }
+           
+            return medicamento;
+        }
+
+        private List<Requisicao> CarregarRequisicoes(SqlConnection conexaoComBanco, Medicamento medicamento)
+        {
+            List<Requisicao> requisicoes = new List<Requisicao>();
+
+            SqlCommand sqlComandoRequisicao = new SqlCommand
                     (sqlSelecionarRequisicaoPorNumero, conexaoComBanco);
 
-                sqlComandoRequisicao.Parameters.AddWithValue("ID", medicamento.Id);
+            sqlComandoRequisicao.Parameters.AddWithValue("ID", medicamento.Id);
 
-                SqlDataReader sqlDataReaderRequisicao = sqlComandoRequisicao.ExecuteReader();
+            SqlDataReader sqlDataReaderRequisicao = sqlComandoRequisicao.ExecuteReader();
 
-                List<Requisicao> requisicoes = new List<Requisicao>();
-                while (sqlDataReaderRequisicao.Read())
-                {
-                    Requisicao requisicao = null;
-                    requisicao = ConverterRequisicao(sqlDataReaderRequisicao);
-                    requisicao.Medicamento = medicamento;
-                    requisicoes.Add(requisicao);
-                }
-                medicamento.Requisicoes = requisicoes;
+            while (sqlDataReaderRequisicao.Read())
+            {
+                Requisicao requisicao = null;
+                requisicao = ConverterRequisicao(sqlDataReaderRequisicao);
+                requisicao.Medicamento = medicamento;
+                requisicoes.Add(requisicao);
             }
-            conexaoComBanco.Close();
+            medicamento.Requisicoes = requisicoes;
 
-            return medicamento;
+            return requisicoes;
         }
 
         public List<Medicamento> SelecionarTodos()
@@ -270,7 +282,7 @@ namespace ControleMedicamento.Infra.BancoDados.ModuloMedicamento
             SqlCommand comandoSelecionarTodos = new SqlCommand(sqlSelecionarTodos, conexaoComBanco);
 
             conexaoComBanco.Open();
-            SqlDataReader sqlDataReader = comandoSelecionarTodos.ExecuteReader();
+           
 
             List<Medicamento> medicamentos = new List<Medicamento>();
             List<Requisicao> todasRequisicoes = new List<Requisicao>();
@@ -282,9 +294,11 @@ namespace ControleMedicamento.Infra.BancoDados.ModuloMedicamento
 
             while (sqlDataReaderRequisicao.Read())
                 todasRequisicoes.Add(ConverterRequisicao(sqlDataReaderRequisicao));
-
+            sqlDataReaderRequisicao.Close();
             todasRequisicoes.OrderBy(x => x.Medicamento.Id);
 
+            SqlDataReader sqlDataReader = comandoSelecionarTodos.ExecuteReader();
+           
             int i = 0;
             while (sqlDataReader.Read())
             {
@@ -294,11 +308,15 @@ namespace ControleMedicamento.Infra.BancoDados.ModuloMedicamento
 
                 //Requisicao requisicao = null;
 
-                while (todasRequisicoes[i].Id == medicamento.Id)
+                foreach (Requisicao requisicao in todasRequisicoes)
                 {
-                    todasRequisicoes[i].Medicamento = medicamento;
-                    requisicoes.Add(todasRequisicoes[i]);
-                    i++;
+                    if(todasRequisicoes[i].Id == medicamento.Id)
+                    {
+                        todasRequisicoes[i].Medicamento = medicamento;
+                        requisicoes.Add(todasRequisicoes[i]);
+                        i++;
+                    }
+                    
                 }
 
                 medicamento.Requisicoes = requisicoes;

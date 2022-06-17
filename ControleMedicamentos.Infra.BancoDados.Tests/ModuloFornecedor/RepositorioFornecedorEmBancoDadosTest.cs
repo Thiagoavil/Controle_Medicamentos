@@ -19,6 +19,8 @@ namespace ControleMedicamentos.Infra.BancoDados.Tests.ModuloFornecedor
 
         public RepositorioFornecedorEmBancoDadosTest()
         {
+            db.ComandoSql("DELETE FROM TBREQUISICAO; DBCC CHECKIDENT (TBREQUISICAO, RESEED, 0)");
+            db.ComandoSql("DELETE FROM TBMEDICAMENTO; DBCC CHECKIDENT (TBMEDICAMENTO, RESEED, 0)");
             db.ComandoSql("DELETE FROM TBFORNECEDOR; DBCC CHECKIDENT (TBFORNECEDOR, RESEED, 0)");
 
             fornecedor = new("umbrella", "322241578", " thiago@gmail.com", "Joiville", "SC");
@@ -59,7 +61,6 @@ namespace ControleMedicamentos.Infra.BancoDados.Tests.ModuloFornecedor
 
             Assert.AreEqual(fornecedor, fornecedorEditado);
         }
-
 
         [TestMethod]
         public void Deve_Excluir_Fornecedor()

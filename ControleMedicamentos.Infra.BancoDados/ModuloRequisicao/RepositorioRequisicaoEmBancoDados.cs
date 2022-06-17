@@ -1,4 +1,5 @@
-﻿using ControleMedicamentos.Dominio.ModuloFuncionario;
+﻿using ControleMedicamentos.Dominio.ModuloFornecedor;
+using ControleMedicamentos.Dominio.ModuloFuncionario;
 using ControleMedicamentos.Dominio.ModuloMedicamento;
 using ControleMedicamentos.Dominio.ModuloPaciente;
 using ControleMedicamentos.Dominio.ModuloRequisicao;
@@ -16,7 +17,7 @@ namespace ControleMedicamentos.Infra.BancoDados.ModuloRequisicao
     {
         private const string enderecoBanco =
             "Data Source=(localdb)\\MSSQLLocalDB;" +
-            "Initial Catalog ControleMedicamentos.Projeto.SqlServer;" +
+            "Initial Catalog=ControleMedicamentos.Projeto.SqlServer;" +
             "Integrated Security = True;" +
             "Pooling=False";
 
@@ -75,19 +76,29 @@ namespace ControleMedicamentos.Infra.BancoDados.ModuloRequisicao
                     MEDICAMENTO.[DESCRICAO] AS MEDICAMENTO_DESCRICAO,
                     MEDICAMENTO.[LOTE] AS MEDICAMENTO_LOTE,
                     MEDICAMENTO.[VALIDADE] AS MEDICAMENTO_VALIDADE,
-                    MEDICAMENTO.[QUANTIDADEDISPONIVEL] AS MEDICAMENTO_QUANTIDADE
+                    MEDICAMENTO.[QUANTIDADEDISPONIVEL] AS MEDICAMENTO_QUANTIDADE,
+
+                    FORNECEDOR.[ID] AS FORNECEDOR_ID,
+                    FORNECEDOR.[NOME] AS FORNECEDOR_NOME,
+                    FORNECEDOR.[TELEFONE] AS FORNECEDOR_TELEFONE,
+                    FORNECEDOR.[EMAIL] AS FORNECEDOR_EMAIL,
+                    FORNECEDOR.[CIDADE] AS FORNECEDOR_CIDADE,
+                    FORNECEDOR.[ESTADO] AS FORNECEDOR_ESTADO
 		          
 	            FROM 
 		            [TBREQUISICAO] AS REQUISICAO INNER JOIN
-                    [TBFUNCIONARIO] AS FORNECEDOR
+                    [TBFUNCIONARIO] AS FUNCIONARIO
                 ON
-                    REQUISICAO.[FUNCIONARIO_NUMERO] = FUNCIONARIO.[ID]
+                    REQUISICAO.[FUNCIONARIO_ID] = FUNCIONARIO.[ID]
                     INNER JOIN [TBPACIENTE] AS PACIENTE
                 ON
-                    REQUISICAO.[PACIENTE_NUMERO] = PACIENTE.[ID]
+                    REQUISICAO.[PACIENTE_ID] = PACIENTE.[ID]
                     INNER JOIN [TBMEDICAMENTO] AS MEDICAMENTO
                 ON
-                    REQUISICAO.[MEDICAMENTO_NUMERO] = MEDICAMENTO.[ID]";
+                    REQUISICAO.[MEDICAMENTO_ID] = MEDICAMENTO.[ID]
+                    INNER JOINE [TBFORNECEDOR] AS FORNECEDOR
+                ON
+                    MEDICAMENTO.[FORNECEDOR_ID]=FORNECEDOR.[ID]";
 
         private const string sqlSelecionarPorNumero =
           @"SELECT 
@@ -109,19 +120,29 @@ namespace ControleMedicamentos.Infra.BancoDados.ModuloRequisicao
                     MEDICAMENTO.[DESCRICAO] AS MEDICAMENTO_DESCRICAO,
                     MEDICAMENTO.[LOTE] AS MEDICAMENTO_LOTE,
                     MEDICAMENTO.[VALIDADE] AS MEDICAMENTO_VALIDADE,
-                    MEDICAMENTO.[QUANTIDADEDISPONIVEL] AS MEDICAMENTO_QUANTIDADE
+                    MEDICAMENTO.[QUANTIDADEDISPONIVEL] AS MEDICAMENTO_QUANTIDADE,
+
+                    FORNECEDOR.[ID] AS FORNECEDOR_ID,
+                    FORNECEDOR.[NOME] AS FORNECEDOR_NOME,
+                    FORNECEDOR.[TELEFONE] AS FORNECEDOR_TELEFONE,
+                    FORNECEDOR.[EMAIL] AS FORNECEDOR_EMAIL,
+                    FORNECEDOR.[CIDADE] AS FORNECEDOR_CIDADE,
+                    FORNECEDOR.[ESTADO] AS FORNECEDOR_ESTADO
 		          
 	            FROM 
 		            [TBREQUISICAO] AS REQUISICAO INNER JOIN
-                    [TBFUNCIONARIO] AS FORNECEDOR
+                    [TBFUNCIONARIO] AS FUNCIONARIO
                 ON
-                    REQUISICAO.[FUNCIONARIO_NUMERO] = FUNCIONARIO.[ID]
+                    REQUISICAO.[FUNCIONARIO_ID] = FUNCIONARIO.[ID]
                     INNER JOIN [TBPACIENTE] AS PACIENTE
                 ON
-                    REQUISICAO.[PACIENTE_NUMERO] = PACIENTE.[ID]
+                    REQUISICAO.[PACIENTE_ID] = PACIENTE.[ID]
                     INNER JOIN [TBMEDICAMENTO] AS MEDICAMENTO
                 ON
-                    REQUISICAO.[MEDICAMENTO_NUMERO] = MEDICAMENTO.[ID]
+                    REQUISICAO.[MEDICAMENTO_ID] = MEDICAMENTO.[ID]
+                    INNER JOIN [TBFORNECEDOR] AS FORNECEDOR
+                ON
+                    MEDICAMENTO.[FORNECEDOR_ID]=FORNECEDOR.[ID]
                 WHERE
                     REQUISICAO.[ID] = @ID";
 
@@ -260,13 +281,17 @@ namespace ControleMedicamentos.Infra.BancoDados.ModuloRequisicao
             DateTime validadeMedicamento = Convert.ToDateTime(leitorRequisicao["MEDICAMENTO_VALIDADE"]);
             int quantidadeMedicamentoDisponivel = Convert.ToInt32(leitorRequisicao["MEDICAMENTO_QUANTIDADE"]);
 
-            var requisicao = new Requisicao()
-            {
-                Id = idRequisicao,
-                QtdMedicamento = quantidadeMedicamentos,
-                Data = dataRequisicao,
-            };
+            int idFornecedor = Convert.ToInt32(leitorRequisicao["FORNECEDOR_ID"]);
+            string nomeFornecedor = Convert.ToString(leitorRequisicao["FORNECEDOR_NOME"]);
+            string telefoneFornecedor = Convert.ToString(leitorRequisicao["FORNECEDOR_TELEFONE"]);
+            string emailFornecedor = Convert.ToString(leitorRequisicao["FORNECEDOR_EMAIL"]);
+            string cidadeFornecedor = Convert.ToString(leitorRequisicao["FORNECEDOR_CIDADE"]);
+            string estadoFornecedor = Convert.ToString(leitorRequisicao["FORNECEDOR_ESTADO"]);
 
+            var fornecedor = new Fornecedor(nomeFornecedor,telefoneFornecedor,emailFornecedor,cidadeFornecedor,estadoFornecedor)
+            {
+                Id = idFornecedor,
+            };
             var paciente = new Paciente(nomePaciente,cartaoSus)
             { 
                 Id= idPaciente,
@@ -279,9 +304,16 @@ namespace ControleMedicamentos.Infra.BancoDados.ModuloRequisicao
 
             var medicamento = new Medicamento(nomeMedicamento, descricaoMedicamento, loteMedicamento, validadeMedicamento)
             {
+                Fornecedor=fornecedor,
                 Id = idMedicamento
             };
 
+            var requisicao = new Requisicao()
+            {
+                Id = idRequisicao,
+                QtdMedicamento = quantidadeMedicamentos,
+                Data = dataRequisicao,
+            };
             requisicao.InserirMedicamento(medicamento);
             requisicao.InserirFuncionario(funcionario);
             requisicao.InserirPaciente(paciente);

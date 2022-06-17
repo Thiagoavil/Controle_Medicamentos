@@ -19,6 +19,7 @@ namespace ControleMedicamentos.Infra.BancoDados.Tests.ModuloFuncionario
 
         public RepositorioFuncionarioEmBancoDadosTest()
         {
+            db.ComandoSql("DELETE FROM TBREQUISICAO; DBCC CHECKIDENT (TBREQUISICAO, RESEED, 0)");
             db.ComandoSql("DELETE FROM TBFUNCIONARIO; DBCC CHECKIDENT (TBFUNCIONARIO, RESEED, 0)");
 
             funcionario = new("thiago", "login", " password");
