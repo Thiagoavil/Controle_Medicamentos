@@ -96,7 +96,7 @@ namespace ControleMedicamentos.Infra.BancoDados.ModuloRequisicao
                     INNER JOIN [TBMEDICAMENTO] AS MEDICAMENTO
                 ON
                     REQUISICAO.[MEDICAMENTO_ID] = MEDICAMENTO.[ID]
-                    INNER JOINE [TBFORNECEDOR] AS FORNECEDOR
+                    INNER JOIN [TBFORNECEDOR] AS FORNECEDOR
                 ON
                     MEDICAMENTO.[FORNECEDOR_ID]=FORNECEDOR.[ID]";
 

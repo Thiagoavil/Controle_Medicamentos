@@ -50,7 +50,6 @@ namespace ControleMedicamentos.Dominio.ModuloRequisicao
                 requisicao.Medicamento.Equals(Medicamento) &&
                 requisicao.Paciente.Equals(Paciente) &&
                 requisicao.QtdMedicamento.Equals(QtdMedicamento) &&
-                requisicao.Data.Equals(Data) &&
                 requisicao.Funcionario.Equals(Funcionario);
         }
     }
